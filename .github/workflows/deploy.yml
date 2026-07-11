@@ -39,4 +39,4 @@ jobs:
           publish_dir: ./public
           publish_branch: main
           external_repository: puretaoist/puretaoist.github.io
-          force: true
+          force_orphan: true
