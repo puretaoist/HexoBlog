@@ -1,0 +1,41 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]        # 当推送到 main 分支时触发
+  workflow_dispatch:        # 支持手动触发
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出源码
+        uses: actions/checkout@v3
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: 缓存依赖
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: 安装依赖
+        run: npm install
+
+      - name: 生成静态文件
+        run: npx hexo generate
+
+      - name: 创建 .nojekyll 文件（禁用 Jekyll 处理）
+        run: echo "" > public/.nojekyll
+
+      - name: 部署到 GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.PERSONAL_TOKEN }}
+          publish_dir: ./public
+          publish_branch: main
+          external_repository: puretaoist/puretaoist.github.io
